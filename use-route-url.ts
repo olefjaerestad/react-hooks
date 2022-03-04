@@ -3,8 +3,11 @@ import { useRouteMatch } from 'react-router-dom';
 
 /**
  * Get the path and URL of the current route match, no trailing slash.
+ *
  * Path: unresolved route params, e.g. `assignment/:id`.
  * URL: resolved route params, e.g. `assignment/123`.
+ *
+ * Must be used within a `<Route />` element (from react-router-dom).
  *
  * @example
  * const {routePath, routeUrl} = useRouteUrl();
