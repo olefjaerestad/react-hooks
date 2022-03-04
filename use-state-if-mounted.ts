@@ -38,7 +38,7 @@ export function useStateIfMounted<T>(
     return () => {
       isMounted.current = false;
     };
-  });
+  }, []);
 
   return [state, setStateIfMounted];
 }
