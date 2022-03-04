@@ -12,6 +12,13 @@ import {
  * Useful if you're setting state after waiting for a promise, and there's a chance
  * the component has unmounted by the time the promise is settled.
  */
+export function useStateIfMounted<T = undefined>(): [
+  state: T | undefined,
+  setState: Dispatch<SetStateAction<T | undefined>>
+];
+export function useStateIfMounted<T>(
+  initialValue: T
+): [state: T, setState: Dispatch<SetStateAction<T>>];
 export function useStateIfMounted<T>(
   initialValue?: T
 ): [state: T | undefined, setState: Dispatch<SetStateAction<T | undefined>>] {
