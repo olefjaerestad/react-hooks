@@ -45,6 +45,7 @@ export function useFetch<
     try {
       const data = (await callback(...args)) as ReturnType<CB>;
       setData(data);
+      !data && setIsLoading(false); // If non 200/300 status code.
       return data;
     } catch (err) {
       setError(err);
