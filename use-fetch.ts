@@ -2,10 +2,14 @@ import { DependencyList, useCallback, useEffect } from 'react';
 import { useStateIfMounted } from './use-state-if-mounted';
 
 /**
- * Wraps the fetch API in order to return information about the request,
- * such as loading state and error. Basically a super simple version of React Query.
+ * Takes a callback function and returns it, along with additional data.
+ * Wrapper around async functionality in order to return additional status
+ * information, such as loading state and error (e.g. for an http request).
+ * Basically a super simple version of React Query.
  * The provided callback argument is not called immediately when the
  * hook runs. To call it, call the returned callback.
+ * Note: Despite the name, the hook works with any (async) functionality,
+ * it doesn't have to be http requests.
  *
  * @example
  * const [getAssignment, assignmentData, isLoading, error] = useFetch(
