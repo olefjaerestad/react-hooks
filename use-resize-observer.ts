@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
  * Get width and height of an element, accounting for resize events.
  */
 export function useResizeObserver(
-  el: Element | undefined,
+  el: Element | undefined | null,
   options?: ResizeObserverOptions
 ): [width: number, height: number] {
   const [width, setWidth] = useState<number>(0);
