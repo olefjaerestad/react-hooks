@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 /**
  * Get width and height of an element, accounting for resize events.
  */
 export function useResizeObserver(
-  el: Element,
+  el: Element | undefined,
   options?: ResizeObserverOptions
 ): [width: number, height: number] {
   const [width, setWidth] = useState<number>(0);
@@ -29,7 +29,9 @@ export function useResizeObserver(
     setHeight(h);
   });
 
-  observer.observe(el, options);
+  useEffect(() => {
+    el && observer.observe(el, options);
+  }, [el]);
 
   return [width, height];
 }
