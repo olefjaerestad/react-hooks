@@ -9,7 +9,7 @@ import { useStateIfMounted } from './use-state-if-mounted';
  * The provided callback argument is not called immediately when the
  * hook runs. To call it, call the returned callback.
  * Note: Despite the name, the hook works with any functionality,
- * it doesn't have to be async, or even promise based.
+ * it doesn't have to be async or promise based.
  *
  * @example
  * const [getAssignment, assignmentData, isLoading, error] = usePromise(
