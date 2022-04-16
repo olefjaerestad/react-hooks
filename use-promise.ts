@@ -8,11 +8,11 @@ import { useStateIfMounted } from './use-state-if-mounted';
  * Basically a super simple version of React Query.
  * The provided callback argument is not called immediately when the
  * hook runs. To call it, call the returned callback.
- * Note: Despite the name, the hook works with any (async) functionality,
- * it doesn't have to be http requests.
+ * Note: Despite the name, the hook works with any functionality,
+ * it doesn't have to be async, or even promise based.
  *
  * @example
- * const [getAssignment, assignmentData, isLoading, error] = useFetch(
+ * const [getAssignment, assignmentData, isLoading, error] = usePromise(
  *   async (assignmentId: string) => {
  *     return await fetch(`https://my-api.com/assignment/${assignmentId}?revision=${revision}`);
  *   },
@@ -22,7 +22,7 @@ import { useStateIfMounted } from './use-state-if-mounted';
  * // Somewhere else in the component:
  * getAssignment('123');
  */
-export function useFetch<
+export function usePromise<
   CB extends (...args: never[]) => unknown | Promise<unknown>
 >(
   callback: CB,
