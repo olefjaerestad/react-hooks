@@ -19,6 +19,7 @@ export function useHasNavigated() {
       // We only need to start listening once.
       unlisten = history.listen(() => {
         hasNavigated = true;
+        unlisten?.();
       });
 
       isListening = true;
