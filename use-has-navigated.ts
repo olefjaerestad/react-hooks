@@ -16,13 +16,14 @@ export function useHasNavigated() {
     let unlisten: ReturnType<typeof history.listen> | undefined;
 
     if (!isListening) {
+      isListening = true;
+      hasNavigated = false;
+      
       // We only need to start listening once.
       unlisten = history.listen(() => {
         hasNavigated = true;
         unlisten?.();
       });
-
-      isListening = true;
     }
 
     return () => {
