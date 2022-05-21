@@ -7,23 +7,24 @@ let isListening: boolean = false;
 /**
  * Returns true or false depending on whether a navigation (i.e. route change)
  * has happened or not during the lifetime of the application.
+ * Pass the `resetOnComponentUnmount` argument to reset navigation status
+ * when component unmounts.
  * Requires react-router-dom.
  */
-export function useHasNavigated() {
+export function useHasNavigated(resetOnComponentUnmount: boolean = false) {
   const history = useHistory();
 
   useEffect(() => {
     let unlisten: ReturnType<typeof history.listen> | undefined;
 
     if (!isListening) {
-      isListening = true;
-      hasNavigated = false;
-      
       // We only need to start listening once.
       unlisten = history.listen(() => {
         hasNavigated = true;
         unlisten?.();
       });
+      
+      isListening = true;
     }
 
     return () => {
@@ -32,8 +33,11 @@ export function useHasNavigated() {
       if (unlisten) {
         isListening = false;
       }
+      if (resetOnComponentUnmount) {
+        hasNavigated = false;
+      }
     };
-  }, []);
+  }, [isListening, resetOnComponentUnmount]);
 
   return hasNavigated;
 }
