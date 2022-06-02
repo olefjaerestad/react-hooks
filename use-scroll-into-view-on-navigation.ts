@@ -28,7 +28,7 @@ export function useScrollIntoViewOnNavigation(
 /** ----------------------------------------------------- */
 
 import { MutableRefObject, useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom-6';
+import { useLocation } from 'react-router-dom';
 
 /**
  * Scroll a given element into view on navigation (i.e. route change).
