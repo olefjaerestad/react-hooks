@@ -11,7 +11,7 @@ import { useRouteMatch } from 'react-router-dom';
  * Path: unresolved route params, e.g. `assignment/:id`.
  * URL: resolved route params, e.g. `assignment/123`.
  *
- * Must be used within a `<Route />` element (from react-router-dom).
+ * Must be used within a `<Router />` element (from react-router-dom).
  * Requires react-router-dom < 6.
  *
  * @example
@@ -51,7 +51,7 @@ const PATH = STANDALONE_MODE
  * Path: unresolved route params, e.g. `assignment/:id`.
  * URL: resolved route params, e.g. `assignment/123`.
  *
- * Must be used within a `<Route />` element (from react-router-dom).
+ * Must be used within a `<Router />` element (from react-router-dom).
  * Requires react-router-dom >= 6.
  *
  * @example
