@@ -40,12 +40,25 @@ export function usePromise<
   const [isLoading, setIsLoading] = useStateIfMounted<boolean>(false);
 
   const callbackWrapper = useCallback(async (...args: Parameters<CB>) => {
-    setIsLoading(true);
+    setTimeout(() => {
+      /**
+       * Hack: We wrap in setTimeout to ensure this is called after the
+       * `catch` block. Useful for consecutive function calls where call 1 is
+       * cancelled when call 2 starts. There are multiple `setIsLoading` calls
+       * in this function, and they're called in the following order:
+       * 1. If there's a function call already running and it was cancelled by
+       *    current call (e.g. with an `AbortController`).
+       * 2. Before current call.
+       * 3. After current call fails.
+       * 4. After current call succeeds.
+       */
+      setIsLoading(true);
+    }, 0);
 
     try {
       const data = (await callback(...args)) as ReturnType<CB>;
       setData(data);
-      !data && setIsLoading(false); // If non 200/300 status code.
+      !data && setTimeout(() => setIsLoading(false), 0); // If non 200/300 status code.
       return data;
     } catch (err) {
       setError(err);
