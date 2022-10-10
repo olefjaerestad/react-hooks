@@ -1,5 +1,6 @@
 import { DependencyList, useCallback, useEffect } from 'react';
-import { useStateIfMounted } from './use-state-if-mounted';
+import { isDefined } from '../utils/type-guards';
+import { useStateIfMounted } from './use-state-if-mounted'; // https://github.com/olefjaerestad/react-hooks/blob/main/use-state-if-mounted.ts
 
 /**
  * Takes a callback function and returns it, along with additional data.
@@ -40,6 +41,8 @@ export function usePromise<
   const [isLoading, setIsLoading] = useStateIfMounted<boolean>(false);
 
   const callbackWrapper = useCallback(async (...args: Parameters<CB>) => {
+    let callbackThrew = false;
+
     setTimeout(() => {
       /**
        * Hack: We wrap in setTimeout to ensure this is called after the
@@ -52,7 +55,13 @@ export function usePromise<
        * 3. After current call fails.
        * 4. After current call succeeds.
        */
-      setIsLoading(true);
+      if (!callbackThrew) {
+        /**
+         * Only setIsLoading if `callback` hasn't already thrown.
+         * Relevant if `callback` throws immediately.
+         */
+        setIsLoading(true);
+      }
     }, 0);
 
     try {
@@ -61,6 +70,7 @@ export function usePromise<
       !data && setTimeout(() => setIsLoading(false), 0); // If non 200/300 status code.
       return data;
     } catch (err) {
+      callbackThrew = true;
       setError(err);
       setIsLoading(false);
       throw err;
@@ -69,7 +79,7 @@ export function usePromise<
 
   useEffect(() => {
     // By using useEffect, we ensure isLoading is always set _after_ data.
-    if (data !== undefined && data !== null) {
+    if (isDefined(data)) {
       setIsLoading(false);
     }
   }, [data]);

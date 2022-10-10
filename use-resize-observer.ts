@@ -9,6 +9,7 @@ export function useResizeObserver(
 ): [width: number, height: number] {
   const [width, setWidth] = useState<number>(0);
   const [height, setHeight] = useState<number>(0);
+  const [forceReRender, setForceReRender] = useState<boolean>(false);
 
   const observer = useMemo(() => {
     return new ResizeObserver((entries) => {
@@ -38,6 +39,20 @@ export function useResizeObserver(
       el && observer.disconnect();
     };
   }, [el]);
+
+  useEffect(() => {
+    /**
+     * Hack: Force rerender in order to recheck if `el` has a value.
+     * `el` will usually be null on first render if passing a ref, like:
+     *
+     * const ref = useRef<HTMLDivElement>(null);
+     * const [width] = useResizeObserver(ref.current);
+     * <div ref={ref}></div>
+     */
+    if (!el && !forceReRender) {
+      setForceReRender(true);
+    }
+  }, [el, forceReRender]);
 
   return [width, height];
 }
