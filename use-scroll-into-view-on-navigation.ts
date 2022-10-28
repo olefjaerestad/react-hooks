@@ -1,5 +1,5 @@
 /**
- * The first version is for react-router-dom v5, the second one is for react-router-dom v6.
+ * The first version is for react-router-dom v5, the second one is for react-router-dom v6, the third one works with both (and is probably the best).
  */
 
 import { MutableRefObject, useEffect } from 'react';
@@ -46,4 +46,26 @@ export function useScrollIntoViewOnNavigation(
       ref.current?.scrollIntoView();
     }
   }, [pathname, prevPathname]);
+}
+
+/** ----------------------------------------------------- */
+
+import { MutableRefObject, useEffect } from 'react';
+import { useHistoryListen } from './use-history-listen'; // https://github.com/olefjaerestad/react-hooks/blob/main/use-history-listen.ts
+
+/**
+ * Scroll a given element into view on navigation (i.e. route change).
+ */
+export function useScrollIntoViewOnNavigation(
+  ref: MutableRefObject<HTMLElement | undefined>
+) {
+  const historyListen = useHistoryListen();
+
+  useEffect(() => {
+    const unlisten = historyListen(() => {
+      ref.current?.scrollIntoView();
+    });
+
+    return () => unlisten();
+  }, []);
 }
