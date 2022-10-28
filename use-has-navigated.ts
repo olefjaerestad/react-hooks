@@ -1,5 +1,5 @@
 /**
- * The first version is for react-router-dom v5, the second one is for react-router-dom v6.
+ * The first version is for react-router-dom v5, the second one is for react-router-dom v6, the third one works with both (and is probably the best).
  */
 
 import { useEffect } from 'react';
@@ -70,6 +70,41 @@ export function useHasNavigated(resetOnComponentUnmount = false) {
       hasNavigated = true;
     }
   }, [pathname, prevPathname]);
+
+  useEffect(() => {
+    return () => {
+      if (resetOnComponentUnmount) {
+        hasNavigated = false;
+      }
+    };
+  }, [resetOnComponentUnmount]);
+
+  return hasNavigated;
+}
+
+/** ------------------------------------------------- */
+
+import { useEffect } from 'react';
+import { useHistoryListen } from './use-history-listen'; // https://github.com/olefjaerestad/react-hooks/blob/main/use-history-listen.ts
+
+let hasNavigated = false;
+
+/**
+ * Returns true or false depending on whether a navigation (i.e. route change)
+ * has happened or not during the lifetime of the application.
+ * Pass the `resetOnComponentUnmount` argument to reset navigation status
+ * when component unmounts.
+ */
+export function useHasNavigated(resetOnComponentUnmount = false) {
+  const historyListen = useHistoryListen();
+
+  useEffect(() => {
+    const unlisten = historyListen(() => {
+      hasNavigated = true;
+    });
+
+    return () => unlisten();
+  }, []);
 
   useEffect(() => {
     return () => {
