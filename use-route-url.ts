@@ -1,5 +1,5 @@
 /**
- * The first version is for react-router-dom v5, the second one is for react-router-dom v6.
+ * The first version is for react-router-dom v5, the second one is for react-router-dom v6, the third one is also for react-router-dom v6.
  */
 
 import { useMemo } from 'react';
@@ -71,6 +71,42 @@ export function useRouteUrl(): { routePath: string; routeUrl: string } {
   const routeUrl = useMemo(() => {
     return url.endsWith('/') ? url.substring(0, url.length - 1) : url;
   }, [url]);
+
+  return { routePath, routeUrl };
+}
+
+/** ---------------------------------------------------------- */
+
+import { useMemo } from 'react';
+import { useHref, useParams } from 'react-router-dom';
+import { unresolve } from '../utils/url-utils'; // https://github.com/olefjaerestad/frontend-snippets/blob/main/url-utils.ts
+
+/**
+ * Get the path and URL of the current route match, no trailing slash.
+ *
+ * Path: unresolved route params, e.g. `assignment/:id`.
+ *
+ * URL: resolved route params, e.g. `assignment/123`.
+ *
+ * Must be used within a `<Router />` element (from react-router-dom).
+ *
+ * @example
+ * const {routePath, routeUrl} = useRouteUrl();
+ */
+export function useRouteUrl(backoffice?: boolean): {
+  routePath: string;
+  routeUrl: string;
+} {
+  const href = useHref('');
+  const params = useParams();
+
+  const routeUrl = useMemo(() => {
+    return href.endsWith('/') ? href.substring(0, href.length - 1) : href;
+  }, [href]);
+
+  const routePath = useMemo(() => {
+    return unresolve(routeUrl, params);
+  }, [params, routeUrl]);
 
   return { routePath, routeUrl };
 }
