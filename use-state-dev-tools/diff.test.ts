@@ -1,4 +1,4 @@
-import { diff, ObjectDiff, PrimitiveDiff } from './diff';
+import { applyDiff, diff, ObjectDiff, PrimitiveDiff } from './diff';
 
 describe('diff', () => {
   describe('should return a diff object for', () => {
@@ -215,5 +215,86 @@ describe('diff', () => {
         },
       });
     });
+  });
+});
+
+describe('applyDiff', () => {
+  describe('should return a value where the diff has been applied for', () => {
+    it('primitive diffs', () => {
+      const prev = 1;
+      const current = 2;
+      const difff = diff(prev, current);
+      const result = difff ? applyDiff(prev, difff) : undefined;
+      expect(result).toEqual(2);
+    });
+
+    it('object diffs', () => {
+      const prev = { foo: 'bar' };
+      const current = { foo: 'baz' };
+      const difff = diff(prev, current);
+      const result = difff ? applyDiff(prev, difff) : undefined;
+      expect(result).toEqual({
+        foo: 'baz',
+      });
+    });
+  });
+
+  describe('should support undoing diff for', () => {
+    it('primitive diffs', () => {
+      const prev = 1;
+      const current = 2;
+      const difff = diff(prev, current);
+      const result = difff ? applyDiff(current, difff, 'prev') : undefined;
+      expect(result).toEqual(1);
+    });
+
+    // it('object diffs', () => {
+    //   const prev = { foo: 'bar' };
+    //   const current = { foo: 'baz' };
+    //   const difff = diff(prev, current);
+    //   const result = difff ? applyDiff(prev, difff) : undefined;
+    //   expect(result).toEqual({
+    //     foo: 'baz',
+    //   });
+    // });
+  });
+
+  describe('should support step-by-step time-travel for', () => {
+    it('primitive diffs', () => {
+      // Travel forwards:
+      let current = 0;
+      const difff1 = diff(current, 1);
+      current = difff1 ? applyDiff(current, difff1) : undefined;
+      expect(current).toEqual(1);
+
+      const difff2 = diff(current, 2);
+      current = difff2 ? applyDiff(current, difff2) : undefined;
+      expect(current).toEqual(2);
+
+      const difff3 = diff(current, 3);
+      current = difff3 ? applyDiff(current, difff3) : undefined;
+      expect(current).toEqual(3);
+
+      // Travel backwards:
+      current = difff2 ? applyDiff(current, difff2) : undefined;
+      expect(current).toEqual(2);
+
+      current = difff1 ? applyDiff(current, difff1) : undefined;
+      expect(current).toEqual(1);
+
+      // And forwards again:
+      current = difff2 ? applyDiff(current, difff2) : undefined;
+      expect(current).toEqual(2);
+    });
+
+    // it('object diffs', () => {
+    //   const prev = { foo: 'bar' };
+    //   const current = { foo: 'baz' };
+    //   const difff = diff(prev, current);
+    //   const result = difff ? applyDiff(prev, difff) : undefined;
+    //   expect(result).toEqual({
+    //     foo: 'baz',
+    //   });
+    // });
   });
 });

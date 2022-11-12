@@ -1,19 +1,25 @@
-import { ObjectDiff, PrimitiveDiff } from './diff';
+import { Diff, ObjectDiff, PrimitiveDiff } from './diff';
 
 const GLOBAL_NAMESPACE = '_STATE_DEV_TOOLS_';
 
-export type DiffHistoryEntry = PrimitiveDiff | ObjectDiff;
+export type DiffHistoryEntry = {
+  diff: Diff;
+};
 
-export interface DiffNamespace {
+export interface StateNamespace {
   diffs: DiffHistoryEntry[];
 }
 
-export interface DiffNamespaces {
-  [key: string]: DiffNamespace;
+export interface StateNamespaces {
+  [key: string]: StateNamespace;
+}
+
+export interface GlobalNamespace {
+  stateNamespaces: StateNamespaces;
 }
 
 declare global {
-  var _STATE_DEV_TOOLS_: DiffNamespaces;
+  var _STATE_DEV_TOOLS_: GlobalNamespace;
 }
 
 /**
@@ -25,13 +31,16 @@ export function storeDiff(
 ) {
   const g = globalObject();
   setupNamespace(namespaceId);
-  g[GLOBAL_NAMESPACE][namespaceId].diffs.push(diff);
+  g[GLOBAL_NAMESPACE].stateNamespaces[namespaceId].diffs.push({ diff });
 }
 
 function setupNamespace(namespaceId: string) {
   const g = globalObject();
   g[GLOBAL_NAMESPACE] = g[GLOBAL_NAMESPACE] || {};
-  g[GLOBAL_NAMESPACE][namespaceId] = g[GLOBAL_NAMESPACE][namespaceId] || {
+  g[GLOBAL_NAMESPACE].stateNamespaces =
+    g[GLOBAL_NAMESPACE].stateNamespaces || {};
+  g[GLOBAL_NAMESPACE].stateNamespaces[namespaceId] = g[GLOBAL_NAMESPACE]
+    .stateNamespaces[namespaceId] || {
     diffs: [],
   };
 }

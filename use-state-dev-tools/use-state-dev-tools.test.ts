@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
 import { useState } from 'react';
-import { DiffNamespace, useStateDevTools } from './';
+import { StateNamespace, useStateDevTools } from './';
 
 describe('useStateDevTools', () => {
   it('should return the provided `useState` result as is', async () => {
@@ -22,18 +22,24 @@ describe('useStateDevTools', () => {
 
     act(() => setState('bar'));
     act(() => setState('baz'));
-    expect(globalThis._STATE_DEV_TOOLS_[name]).toEqual<DiffNamespace>({
+    expect(
+      globalThis._STATE_DEV_TOOLS_.stateNamespaces[name]
+    ).toEqual<StateNamespace>({
       diffs: [
         {
-          _diff: {
-            prev: 'foo',
-            current: 'bar',
+          diff: {
+            _diff: {
+              prev: 'foo',
+              current: 'bar',
+            },
           },
         },
         {
-          _diff: {
-            prev: 'bar',
-            current: 'baz',
+          diff: {
+            _diff: {
+              prev: 'bar',
+              current: 'baz',
+            },
           },
         },
       ],
