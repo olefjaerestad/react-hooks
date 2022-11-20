@@ -1,10 +1,10 @@
-import { Dispatch, SetStateAction, useEffect, useRef } from 'react';
+import { Dispatch, SetStateAction, useEffect, useMemo, useRef } from 'react';
 import { diff } from './diff';
 import { storeDiff } from './time-travel';
 
 type UseStateReturnValue<S> = [S, Dispatch<SetStateAction<S>>];
 
-let GLOBAL_CALL_COUNT = 0;
+let UNNAMED_CALL_COUNT = 0;
 
 /**
  * This hook, accompanied by the corresponding Chrome extension, aims to
@@ -27,7 +27,7 @@ export function useStateDevTools<S>(
 ): UseStateReturnValue<S> {
   const [val, setVal] = useStateValue;
   const prevVal = useRef(val);
-  const id = useRef(uniqueName || GLOBAL_CALL_COUNT);
+  const id = useMemo(() => uniqueName || `untitled_${UNNAMED_CALL_COUNT++}`, []);
 
   // const setter: Dispatch<SetStateAction<S>> = useCallback(
   //   (value: SetStateAction<S>) => {
@@ -49,14 +49,10 @@ export function useStateDevTools<S>(
     // diff(JSON.stringify(val), JSON.stringify(prevVal.current))
     // ();
 
-    if (difff) storeDiff(id.current.toString(), difff);
+    if (difff) storeDiff(id.toString(), difff);
 
     prevVal.current = val;
   }, [val]);
-
-  useEffect(() => {
-    GLOBAL_CALL_COUNT++;
-  }, []);
 
   return [val, setVal];
 }

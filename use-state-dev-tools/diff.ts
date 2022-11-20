@@ -1,7 +1,7 @@
 export interface PrimitiveDiff {
   _diff: {
-    prev: any;
-    current: any;
+    a: any;
+    b: any;
   };
 }
 
@@ -15,8 +15,8 @@ type Primitive = string | number | bigint | boolean | symbol | null | undefined;
 
 /**
  * Compares two values and returns the difference between them. Deeply compares
- * objects; both `prev` and `current` must be objects for object comparison to
- * take effect.
+ * objects; both `a` and `b` must be objects for object comparison to take 
+ * effect.
  * - Compared by value: primitive values, objects.
  * - Compared by reference: arrays, functions.
  *
@@ -27,8 +27,8 @@ type Primitive = string | number | bigint | boolean | symbol | null | undefined;
  * @example
  * // {
  * //   _diff: {
- * //     prev: 'foo',
- * //     current: 'bar',
+ * //     a: 'foo',
+ * //     b: 'bar',
  * //   },
  * // };
  * diff('foo', 'bar');
@@ -36,21 +36,19 @@ type Primitive = string | number | bigint | boolean | symbol | null | undefined;
  * // {
  * //   foo: {
  * //     _diff: {
- * //       prev: 'bar',
- * //       current: 'baz',
+ * //       a: 'bar',
+ * //       b: 'baz',
  * //     },
  * //   },
  * // }
  * diff({foo: 'bar'}, {foo: 'baz'});
  */
-export const diff = (prev: any, current: any): Diff | undefined => {
-  if (isObject(prev) && isObject(current)) {
-    const keys = Array.from(
-      new Set([...Object.keys(prev), ...Object.keys(current)])
-    );
+export const diff = (a: any, b: any): Diff | undefined => {
+  if (isObject(a) && isObject(b)) {
+    const keys = Array.from(new Set([...Object.keys(a), ...Object.keys(b)]));
 
     const diffs: ObjectDiff = keys.reduce((diffs, key) => {
-      const difff = diff(prev[key], current[key]);
+      const difff = diff(a[key], b[key]);
       if (difff) diffs[key] = difff;
 
       return diffs;
@@ -60,11 +58,11 @@ export const diff = (prev: any, current: any): Diff | undefined => {
     return diffs;
   }
 
-  return prev !== current
+  return a !== b
     ? {
         _diff: {
-          prev,
-          current,
+          a: a,
+          b: b,
         },
       }
     : undefined;
@@ -72,14 +70,10 @@ export const diff = (prev: any, current: any): Diff | undefined => {
 
 /**
  * Apply the provided `diff` to the provided `originalValue`.
- * The `to` parameter controls whether the 'current' or 'prev' values of the
+ * The `to` parameter controls whether the 'a' or 'b' values of the
  * diff will be used (allows time traveling back and forth between states).
  */
-export const applyDiff = <T>(
-  originalValue: T,
-  diff: Diff,
-  to: 'current' | 'prev' = 'current'
-) => {
+export const applyDiff = <T>(originalValue: T, diff: Diff, to: 'a' | 'b' = 'b') => {
   if (isPrimitiveDiff(diff) && isPrimitive(diff._diff[to])) {
     return diff._diff[to];
   }
@@ -114,8 +108,8 @@ const isPrimitiveDiff = (value: any): value is PrimitiveDiff => {
   return (
     isObject(value) &&
     value.hasOwnProperty('_diff') &&
-    value._diff?.hasOwnProperty('prev') &&
-    value._diff?.hasOwnProperty('current') &&
+    value._diff?.hasOwnProperty('a') &&
+    value._diff?.hasOwnProperty('b') &&
     Object.keys(value._diff).length === 2
   );
 };

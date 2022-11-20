@@ -15,30 +15,27 @@ describe('useStateDevTools', () => {
 
   it('should store diffs in the global object', async () => {
     const name = 'uniqueName';
-    const { result } = renderHook(() =>
-      useStateDevTools(useState('foo'), name)
-    );
+    const { result } = renderHook(() => useStateDevTools(useState('foo'), name));
     const [, setState] = result.current;
 
     act(() => setState('bar'));
     act(() => setState('baz'));
-    expect(
-      globalThis._STATE_DEV_TOOLS_.stateNamespaces[name]
-    ).toEqual<StateNamespace>({
-      diffs: [
+
+    expect(globalThis._STATE_DEV_TOOLS_.stateNamespaces[name]).toEqual<StateNamespace>({
+      stateEntries: [
         {
           diff: {
             _diff: {
-              prev: 'foo',
-              current: 'bar',
+              a: 'foo',
+              b: 'bar',
             },
           },
         },
         {
           diff: {
             _diff: {
-              prev: 'bar',
-              current: 'baz',
+              a: 'bar',
+              b: 'baz',
             },
           },
         },

@@ -5,14 +5,14 @@ describe('diff', () => {
     it('non-equal primitive values', () => {
       expect(diff('foo', 'bar')).toEqual<PrimitiveDiff>({
         _diff: {
-          prev: 'foo',
-          current: 'bar',
+          a: 'foo',
+          b: 'bar',
         },
       });
       expect(diff(1, true)).toEqual<PrimitiveDiff>({
         _diff: {
-          prev: 1,
-          current: true,
+          a: 1,
+          b: true,
         },
       });
     });
@@ -20,8 +20,8 @@ describe('diff', () => {
     it('non-equal (by reference) arrays', () => {
       expect(diff([1, 2, 3], [1, 2, 3])).toEqual<PrimitiveDiff>({
         _diff: {
-          prev: [1, 2, 3],
-          current: [1, 2, 3],
+          a: [1, 2, 3],
+          b: [1, 2, 3],
         },
       });
     });
@@ -32,14 +32,14 @@ describe('diff', () => {
 
       expect(diff(fn1, fn2)).toEqual<PrimitiveDiff>({
         _diff: {
-          prev: fn1,
-          current: fn2,
+          a: fn1,
+          b: fn2,
         },
       });
     });
 
     it('non-equal (by value) objects', () => {
-      const prev = {
+      const a = {
         foo: 'bar',
         person: {
           age: 30,
@@ -49,7 +49,7 @@ describe('diff', () => {
           },
         },
       };
-      const current = {
+      const b = {
         foo: 'baz',
         person: {
           age: 30,
@@ -60,19 +60,19 @@ describe('diff', () => {
         },
       };
 
-      expect(diff(prev, current)).toEqual<ObjectDiff>({
+      expect(diff(a, b)).toEqual<ObjectDiff>({
         foo: {
           _diff: {
-            prev: 'bar',
-            current: 'baz',
+            a: 'bar',
+            b: 'baz',
           },
         },
         person: {
           names: {
             last: {
               _diff: {
-                prev: 'Jackson',
-                current: 'Johnson',
+                a: 'Jackson',
+                b: 'Johnson',
               },
             },
           },
@@ -81,7 +81,7 @@ describe('diff', () => {
     });
 
     it('non-equal (by value) objects with different keys', () => {
-      const prev = {
+      const a = {
         foo: 'bar',
         location: {
           coordinates: {
@@ -97,7 +97,7 @@ describe('diff', () => {
           },
         },
       };
-      const current = {
+      const b = {
         bar: 'bar',
         person: {
           age: 30,
@@ -109,60 +109,60 @@ describe('diff', () => {
         },
       };
 
-      expect(diff(prev, current)).toEqual<ObjectDiff>({
+      expect(diff(a, b)).toEqual<ObjectDiff>({
         foo: {
           _diff: {
-            prev: 'bar',
-            current: undefined,
+            a: 'bar',
+            b: undefined,
           },
         },
         bar: {
           _diff: {
-            prev: undefined,
-            current: 'bar',
+            a: undefined,
+            b: 'bar',
           },
         },
         location: {
           _diff: {
-            prev: {
+            a: {
               coordinates: {
                 lat: 12.456,
                 long: 7.89,
               },
             },
-            current: undefined,
+            b: undefined,
           },
         },
         person: {
           hobbies: {
             _diff: {
-              prev: undefined,
-              current: ['Soccer', 'Video games'],
+              a: undefined,
+              b: ['Soccer', 'Video games'],
             },
           },
           names: {
             first: {
               _diff: {
-                prev: undefined,
-                current: 'Jack',
+                a: undefined,
+                b: 'Jack',
               },
             },
             firstName: {
               _diff: {
-                prev: 'Jack',
-                current: undefined,
+                a: 'Jack',
+                b: undefined,
               },
             },
             last: {
               _diff: {
-                prev: undefined,
-                current: 'Johnson',
+                a: undefined,
+                b: 'Johnson',
               },
             },
             lastName: {
               _diff: {
-                prev: 'Jackson',
-                current: undefined,
+                a: 'Jackson',
+                b: undefined,
               },
             },
           },
@@ -204,14 +204,14 @@ describe('diff', () => {
     it('compare primitive values to objects', () => {
       expect(diff('foo', { bar: 'baz' })).toEqual<PrimitiveDiff>({
         _diff: {
-          prev: 'foo',
-          current: { bar: 'baz' },
+          a: 'foo',
+          b: { bar: 'baz' },
         },
       });
       expect(diff({ bar: 'baz' }, 'foo')).toEqual<PrimitiveDiff>({
         _diff: {
-          prev: { bar: 'baz' },
-          current: 'foo',
+          a: { bar: 'baz' },
+          b: 'foo',
         },
       });
     });
@@ -221,18 +221,18 @@ describe('diff', () => {
 describe('applyDiff', () => {
   describe('should return a value where the diff has been applied for', () => {
     it('primitive diffs', () => {
-      const prev = 1;
-      const current = 2;
-      const difff = diff(prev, current);
-      const result = difff ? applyDiff(prev, difff) : undefined;
+      const a = 1;
+      const b = 2;
+      const difff = diff(a, b);
+      const result = difff ? applyDiff(a, difff) : undefined;
       expect(result).toEqual(2);
     });
 
     it('object diffs', () => {
-      const prev = { foo: 'bar' };
-      const current = { foo: 'baz' };
-      const difff = diff(prev, current);
-      const result = difff ? applyDiff(prev, difff) : undefined;
+      const a = { foo: 'bar' };
+      const b = { foo: 'baz' };
+      const difff = diff(a, b);
+      const result = difff ? applyDiff(a, difff) : undefined;
       expect(result).toEqual({
         foo: 'baz',
       });
@@ -241,18 +241,18 @@ describe('applyDiff', () => {
 
   describe('should support undoing diff for', () => {
     it('primitive diffs', () => {
-      const prev = 1;
-      const current = 2;
-      const difff = diff(prev, current);
-      const result = difff ? applyDiff(current, difff, 'prev') : undefined;
+      const a = 1;
+      const b = 2;
+      const difff = diff(a, b);
+      const result = difff ? applyDiff(b, difff, 'a') : undefined;
       expect(result).toEqual(1);
     });
 
     // it('object diffs', () => {
-    //   const prev = { foo: 'bar' };
-    //   const current = { foo: 'baz' };
-    //   const difff = diff(prev, current);
-    //   const result = difff ? applyDiff(prev, difff) : undefined;
+    //   const a = { foo: 'bar' };
+    //   const b = { foo: 'baz' };
+    //   const difff = diff(a, b);
+    //   const result = difff ? applyDiff(a, difff) : undefined;
     //   expect(result).toEqual({
     //     foo: 'baz',
     //   });
@@ -262,36 +262,36 @@ describe('applyDiff', () => {
   describe('should support step-by-step time-travel for', () => {
     it('primitive diffs', () => {
       // Travel forwards:
-      let current = 0;
-      const difff1 = diff(current, 1);
-      current = difff1 ? applyDiff(current, difff1) : undefined;
-      expect(current).toEqual(1);
+      let a = 0;
+      const difff1 = diff(a, 1);
+      a = difff1 ? applyDiff(a, difff1) : undefined;
+      expect(a).toEqual(1);
 
-      const difff2 = diff(current, 2);
-      current = difff2 ? applyDiff(current, difff2) : undefined;
-      expect(current).toEqual(2);
+      const difff2 = diff(a, 2);
+      a = difff2 ? applyDiff(a, difff2) : undefined;
+      expect(a).toEqual(2);
 
-      const difff3 = diff(current, 3);
-      current = difff3 ? applyDiff(current, difff3) : undefined;
-      expect(current).toEqual(3);
+      const difff3 = diff(a, 3);
+      a = difff3 ? applyDiff(a, difff3) : undefined;
+      expect(a).toEqual(3);
 
       // Travel backwards:
-      current = difff2 ? applyDiff(current, difff2) : undefined;
-      expect(current).toEqual(2);
+      a = difff2 ? applyDiff(a, difff2) : undefined;
+      expect(a).toEqual(2);
 
-      current = difff1 ? applyDiff(current, difff1) : undefined;
-      expect(current).toEqual(1);
+      a = difff1 ? applyDiff(a, difff1) : undefined;
+      expect(a).toEqual(1);
 
       // And forwards again:
-      current = difff2 ? applyDiff(current, difff2) : undefined;
-      expect(current).toEqual(2);
+      a = difff2 ? applyDiff(a, difff2) : undefined;
+      expect(a).toEqual(2);
     });
 
     // it('object diffs', () => {
-    //   const prev = { foo: 'bar' };
-    //   const current = { foo: 'baz' };
-    //   const difff = diff(prev, current);
-    //   const result = difff ? applyDiff(prev, difff) : undefined;
+    //   const a = { foo: 'bar' };
+    //   const b = { foo: 'baz' };
+    //   const difff = diff(a, b);
+    //   const result = difff ? applyDiff(a, difff) : undefined;
     //   expect(result).toEqual({
     //     foo: 'baz',
     //   });
