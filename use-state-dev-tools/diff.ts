@@ -11,7 +11,7 @@ export type ObjectDiff = {
 
 export type Diff = PrimitiveDiff | ObjectDiff;
 
-type Primitive = string | number | bigint | boolean | symbol | null | undefined;
+// type Primitive = string | number | bigint | boolean | symbol | null | undefined;
 
 /**
  * Compares two values and returns the difference between them. Deeply compares
@@ -73,9 +73,13 @@ export const diff = (a: any, b: any): Diff | undefined => {
  * The `to` parameter controls whether the 'a' or 'b' values of the
  * diff will be used (allows time traveling back and forth between states).
  */
-export const applyDiff = <T>(originalValue: T, diff: Diff, to: 'a' | 'b' = 'b') => {
-  if (isPrimitiveDiff(diff) && isPrimitive(diff._diff[to])) {
+export const applyDiff = <T>(originalValue: T, diff: Diff | undefined, to: 'a' | 'b' = 'b') => {
+  baseCase: if (isPrimitiveDiff(diff)) {
     return diff._diff[to];
+  }
+
+  if (!diff) {
+    return originalValue;
   }
 
   const result = isObject(originalValue)
@@ -84,12 +88,15 @@ export const applyDiff = <T>(originalValue: T, diff: Diff, to: 'a' | 'b' = 'b') 
     ? [...originalValue]
     : originalValue;
 
-  // TODO: Handle object diffs.
   if (isObject(result) && isObjectDiff(diff)) {
     Object.keys(diff).forEach((key) => {
-      result[key as any] = diff[key];
+      result[key as any] = applyDiff(result[key as any], diff[key], to);
     });
+
+    return result;
   }
+
+  return undefined;
 };
 
 const isObject = (value: any): value is Record<any, any> => {
@@ -100,9 +107,9 @@ const isArray = (value: any): value is Array<any> => {
   return Array.isArray(value);
 };
 
-const isPrimitive = (value: any): value is Primitive => {
-  return !isObject(value) && !isArray(value);
-};
+// const isPrimitive = (value: any): value is Primitive => {
+//   return !isObject(value) && !isArray(value);
+// };
 
 const isPrimitiveDiff = (value: any): value is PrimitiveDiff => {
   return (
