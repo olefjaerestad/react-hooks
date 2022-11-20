@@ -69,7 +69,8 @@ export const diff = (a: any, b: any): Diff | undefined => {
 };
 
 /**
- * Apply the provided `diff` to the provided `originalValue`.
+ * Applies the provided `diff` to the provided `originalValue`, and returns a
+ * shallow copy of `originalValue`.
  * The `to` parameter controls whether the 'a' or 'b' values of the
  * diff will be used (allows time traveling back and forth between states).
  */
@@ -78,15 +79,15 @@ export const applyDiff = <T>(originalValue: T, diff: Diff | undefined, to: 'a' |
     return diff._diff[to];
   }
 
-  if (!diff) {
-    return originalValue;
-  }
-
   const result = isObject(originalValue)
     ? { ...originalValue }
     : isArray(originalValue)
     ? [...originalValue]
     : originalValue;
+
+  if (!diff) {
+    return result;
+  }
 
   if (isObject(result) && isObjectDiff(diff)) {
     Object.keys(diff).forEach((key) => {

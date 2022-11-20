@@ -304,7 +304,7 @@ describe('applyDiff', () => {
     });
   });
 
-  describe('should return original value if the diff is empty for', () => {
+  describe('should return (a shallow copy of) original value if the diff is empty for', () => {
     it('primitive values', () => {
       const a = 1;
       const b = 1;
@@ -325,7 +325,7 @@ describe('applyDiff', () => {
       const d = arr;
       const difff2 = diff(c, d);
       const result2 = applyDiff(c, difff2);
-      expect(result2).toBe(arr);
+      expect(result2).not.toBe(arr);
     });
 
     it('object values', () => {
@@ -340,7 +340,7 @@ describe('applyDiff', () => {
       const d = obj;
       const difff2 = diff(c, d);
       const result2 = applyDiff(c, difff2);
-      expect(result2).toBe(obj);
+      expect(result2).not.toBe(obj);
     });
   });
 
