@@ -47,7 +47,7 @@ export function useDebounce<
         }
       }, timeoutMs);
     },
-    [callback, [timeoutMs, ...deps]]
+    [callback, timeoutMs, ...deps]
   );
 
   return [callbackWrapper, value, error];
