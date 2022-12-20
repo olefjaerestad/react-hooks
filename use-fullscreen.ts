@@ -92,12 +92,17 @@ function hideOverflowIOSFix(el: HTMLElement) {
  * Get cross-browser compatible `requestFullscreen` and `exitFullscreen` functions.
  * Uses native Fullscreen API if supported, and fallbacks to a custom implementation.
  *
+ * Takes an optional `orientation` argument. If provided, the site will
+ * automatically be rotated (if necessary) when entering fullscreen. The support
+ * for this is limited by the browser support for `ScreenOrientation.lock`.
+ *
  * If the native Fullscreen API is used, you can style the fullscreen element
- * with the `:fullscreen` CSS pseudo class. A `.useFullscreen` CSS class is
- * also added to the fullscreen element, so that can also be used for styling
- * (keep in mind most CSS selectors are non-forgiving).
+ * with the `:fullscreen` CSS pseudo class. In addition, a `.useFullscreen` CSS
+ * class is always added to the fullscreen element, so that can also be used for
+ * styling (keep in mind most CSS selectors are non-forgiving).
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/ScreenOrientation/lock
  *
  * @example
  *
@@ -121,7 +126,7 @@ function hideOverflowIOSFix(el: HTMLElement) {
  * <div ref={ref}>I can go fullscreen</div>
  * <button onClick={enterExitFullscreen}>Go fullscreen</button>
  */
-export function useFullscreen(): {
+export function useFullscreen(orientation?: OrientationLockType): {
   exitFullscreen: IExitFullscreenFn;
   isFullscreen: boolean;
   requestFullscreen: IRequestFullscreenFn;
@@ -135,6 +140,7 @@ export function useFullscreen(): {
     // @ts-ignore: Property 'webkitExitFullscreen' does not exist on type 'Document'.
     const exit = document.exitFullscreen || document.webkitExitFullscreen;
 
+    screen?.orientation?.unlock?.();
     await exit.call(document);
     if (fullscreenElement.current) removeFullscreenClass(fullscreenElement.current);
     fullscreenElement.current = undefined;
@@ -161,11 +167,16 @@ export function useFullscreen(): {
       const request = el?.requestFullscreen || el?.webkitRequestFullscreen;
 
       await request.call(el, options);
+      if (orientation !== undefined) {
+        await screen?.orientation?.lock?.(orientation).catch(() => {
+          /* noop */
+        });
+      }
       addFullscreenClass(el);
       fullscreenElement.current = el;
       setIsFullscreen(true);
     },
-    []
+    [orientation]
   );
 
   const requestFullscreenCustom: IRequestFullscreenFn = useCallback(
