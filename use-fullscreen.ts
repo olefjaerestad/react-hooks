@@ -94,7 +94,10 @@ function hideOverflowIOSFix(el: HTMLElement) {
  *
  * Takes an optional `orientation` argument. If provided, the site will
  * automatically be rotated (if necessary) when entering fullscreen. The support
- * for this is limited by the browser support for `ScreenOrientation.lock`.
+ * for this is limited by the browser support for `ScreenOrientation.lock`. This
+ * also fixes a chromium bug where certain HTML elements (especially those
+ * positioned outside of normal flow) would be placed behind browser UI when
+ * exiting fullscreen mode.
  *
  * If the native Fullscreen API is used, you can style the fullscreen element
  * with the `:fullscreen` CSS pseudo class. In addition, a `.useFullscreen` CSS
@@ -103,6 +106,7 @@ function hideOverflowIOSFix(el: HTMLElement) {
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API
  * @see https://developer.mozilla.org/en-US/docs/Web/API/ScreenOrientation/lock
+ * @see https://bugs.chromium.org/p/chromium/issues/detail?id=497543
  *
  * @example
  *
