@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { DependencyList, useCallback, useEffect } from 'react';
 import { isDefined } from '../utils/type-guards';
-import { useStateIfMounted } from './use-state-if-mounted'; // https://github.com/olefjaerestad/react-hooks/blob/main/use-state-if-mounted.ts
+import { useStateIfMounted } from './use-state-if-mounted';
 
 /**
  * Takes a callback function and returns it, along with additional data.
@@ -23,21 +25,18 @@ import { useStateIfMounted } from './use-state-if-mounted'; // https://github.co
  * // Somewhere else in the component:
  * getAssignment('123');
  */
-export function usePromise<
-  CB extends (...args: never[]) => unknown | Promise<unknown>
->(
+export function usePromise<CB extends (...args: never[]) => unknown | Promise<unknown>>(
   callback: CB,
   deps: DependencyList
 ): [
-  callback: (
-    ...args: Parameters<CB>
-  ) => Promise<Awaited<ReturnType<CB>> | undefined>,
+  callback: (...args: Parameters<CB>) => Promise<Awaited<ReturnType<CB>>>,
   data: Awaited<ReturnType<CB>> | undefined,
   isLoading: boolean,
-  error: any
+  error: unknown
 ] {
   const [data, setData] = useStateIfMounted<ReturnType<CB>>();
-  const [error, setError] = useStateIfMounted<any>();
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const [error, setError] = useStateIfMounted<unknown>();
   const [isLoading, setIsLoading] = useStateIfMounted<boolean>(false);
 
   const callbackWrapper = useCallback(async (...args: Parameters<CB>) => {
@@ -68,6 +67,7 @@ export function usePromise<
       const data = (await callback(...args)) as ReturnType<CB>;
       setData(data);
       !data && setTimeout(() => setIsLoading(false), 0); // If non 200/300 status code.
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return data;
     } catch (err) {
       callbackThrew = true;
@@ -75,6 +75,7 @@ export function usePromise<
       setIsLoading(false);
       throw err;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 
   useEffect(() => {
@@ -82,7 +83,8 @@ export function usePromise<
     if (isDefined(data)) {
       setIsLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
-  return [callbackWrapper, data, isLoading, error];
+  return [callbackWrapper as (...args: Parameters<CB>) => Promise<Awaited<ReturnType<CB>>>, data, isLoading, error];
 }
