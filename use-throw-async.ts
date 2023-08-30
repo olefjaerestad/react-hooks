@@ -1,5 +1,4 @@
-import { useCallback } from 'react';
-import { useStateIfMounted } from './use-state-if-mounted';
+import { useCallback, useState } from 'react';
 
 /**
  * React error boundaries are by default unable to detect async errors, as they
@@ -8,9 +7,9 @@ import { useStateIfMounted } from './use-state-if-mounted';
  * pick up the error. Remember to wrap your component in an error boundary
  * before using this hook.
  *
- * - https://reactjs.org/docs/error-boundaries.html
- * - https://medium.com/trabe/catching-asynchronous-errors-in-react-using-error-boundaries-5e8a5fd7b971
- * - https://github.com/facebook/react/issues/14981#issuecomment-468460187
+ * @see https://reactjs.org/docs/error-boundaries.html
+ * @see https://medium.com/trabe/catching-asynchronous-errors-in-react-using-error-boundaries-5e8a5fd7b971
+ * @see https://github.com/facebook/react/issues/14981#issuecomment-468460187
  *
  * @example
  * const throwAsync = useThrowAsync();
@@ -20,7 +19,7 @@ import { useStateIfMounted } from './use-state-if-mounted';
  *   .catch(throwAsync);
  */
 export function useThrowAsync(ignoreAbortErrors: boolean = true) {
-  const [error, setError] = useStateIfMounted<Error>();
+  const [error, setError] = useState();
 
   const throwAsync = useCallback(
     (err: Error) => {
