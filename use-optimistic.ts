@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 
 /**
+ * Note: You probably want to use `useReversible` instead of `useOptimistic`: https://github.com/olefjaerestad/react-hooks/blob/main/use-reversible.ts
+ * 
  * A hook to achieve optimistic updates.
  *
  * Works like `useState`, with the exception that `state` changes to match
