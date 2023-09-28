@@ -14,6 +14,10 @@ type IUndoFunction = () => void;
  * rollback yourself, `setState` also returns a parameterless `undo` function
  * that undoes the state change.
  *
+ * Note: if you're using something like React Query, this already has it's own
+ * way of doing optimistic updates and rollbacks. 
+ * See https://tanstack.com/query/v4/docs/react/guides/optimistic-updates.
+ *
  * @example
  * const [name, setName] = useState('John');
  *
