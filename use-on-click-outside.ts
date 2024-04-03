@@ -1,25 +1,29 @@
+import { useEffect, useRef } from 'react';
+
 /**
  * Run callback when a click event occurs outside of the provided `ref`.
  * Useful for closing dialogs, dropdowns, etc.
  *
- * Note: If you have an "open dialog" button, clicking this would by default 
- * register as a click outside the dialog, and potentially close the dialog 
- * before it's ever opened. To prevent this, use the optional `active` argument 
+ * Note: If you have an "open dialog" button, clicking this would by default
+ * register as a click outside the dialog, and potentially close the dialog
+ * before it's ever opened. To prevent this, use the optional `active` parameter
  * to control when the outside click handler should be active.
  *
  * @example
  *
+ * const [open, setOpen] = useState(true);
  * const ref = useRef<HTMLDialogElement>(null);
  *
- * const onClickOutside = useOnClickOutside(ref, isOpen); // `isOpen` could be a prop, state, etc.
+ * const onClickOutside = useOnClickOutside(ref, open); // Note: second argument is optional.
  * onClickOutside((event) => {
  *   console.log('You clicked outside the open dialog');
  *   console.log(event); // The original `MouseEvent`.
+ *   setOpen(false);
  * });
  *
  * ...
  *
- * <dialog ref={ref}>
+ * <dialog ref={ref} open={open}>
  */
 function useOnClickOutside(
   ref: React.MutableRefObject<HTMLElement>,
