@@ -53,3 +53,5 @@ function useOnClickOutside(
 
   return onClickOutside;
 }
+
+export { useOnClickOutside };
