@@ -31,8 +31,8 @@ function useThrottle<
 ] {
   const [value, setValue] = useState<ReturnType<CALLBACK>>();
   const [error, setError] = useState<unknown>();
-  const timeoutId = useRef<ReturnType<typeof setTimeout>>();
   const prevCallTimestamp = useRef<number>(0);
+  const timeoutId = useRef<ReturnType<typeof setTimeout>>();
 
   const throttled = useCallback(
     (...args: Parameters<CALLBACK>) => {
