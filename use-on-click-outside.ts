@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { MutableRefObject, useEffect, useRef } from 'react';
 
 /**
  * Run callback when a click event occurs outside of the provided `ref`.
@@ -26,7 +26,7 @@ import { useEffect, useRef } from 'react';
  * <dialog ref={ref} open={open}>
  */
 function useOnClickOutside(
-  ref: React.MutableRefObject<HTMLElement>,
+  ref: MutableRefObject<HTMLElement | null | undefined>,
   active = true
 ) {
   const cb = useRef<(event: MouseEvent) => void>();
