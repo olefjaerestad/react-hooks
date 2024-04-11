@@ -29,7 +29,7 @@ function useShowDialog(options: {
         options.dialog.current?.close();
       }
     }
-  }, [options.disabled, options.mode, options.open]);
+  }, [options.dialog, options.disabled, options.mode, options.open]);
 }
 
 export { useShowDialog };
