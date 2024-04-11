@@ -7,7 +7,7 @@ import { MutableRefObject, useEffect } from 'react';
  * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog
  */
 function useShowDialog(options: {
-  dialog: MutableRefObject<HTMLDialogElement>;
+  dialog: MutableRefObject<HTMLDialogElement | null | undefined>;
   /** Disable hook. */
   disabled?: boolean;
   mode: 'modal' | 'nonmodal';
