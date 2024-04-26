@@ -6,7 +6,12 @@ import { MutableRefObject, useEffect } from 'react';
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog
  */
-function useShowDialog(options: {
+function useShowDialog({
+  dialog,
+  disabled,
+  mode,
+  open,
+}: {
   dialog: MutableRefObject<HTMLDialogElement | null | undefined>;
   /** Disable hook. */
   disabled?: boolean;
@@ -14,22 +19,18 @@ function useShowDialog(options: {
   open: boolean;
 }) {
   useEffect(() => {
-    if (options.disabled) {
-      return;
-    }
+    if (disabled) return;
 
-    if (options.open) {
-      if (!options.dialog.current?.open) {
-        options.mode === 'modal'
-          ? options.dialog.current?.showModal()
-          : options.dialog.current?.show();
+    if (open) {
+      if (!dialog.current?.open) {
+        mode === 'modal' ? dialog.current?.showModal() : dialog.current?.show();
       }
     } else {
-      if (options.dialog.current?.open) {
-        options.dialog.current?.close();
+      if (dialog.current?.open) {
+        dialog.current?.close();
       }
     }
-  }, [options.dialog, options.disabled, options.mode, options.open]);
+  }, [dialog, disabled, mode, open]);
 }
 
 export { useShowDialog };
