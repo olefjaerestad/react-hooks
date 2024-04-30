@@ -21,15 +21,21 @@ function useShowDialog({
   useEffect(() => {
     if (disabled) return;
 
-    if (open) {
-      if (!dialog.current?.open) {
-        mode === 'modal' ? dialog.current?.showModal() : dialog.current?.show();
+    setTimeout(() => {
+      // By wrapping with a timeout, we ensure that any external show/hide logic
+      // of the dialog (e.g. adding/removing it from the DOM) has the chance to
+      // run before we try to show/hide it.
+
+      if (open) {
+        if (!dialog.current?.open) {
+          mode === 'modal' ? dialog.current?.showModal() : dialog.current?.show();
+        }
+      } else {
+        if (dialog.current?.open) {
+          dialog.current?.close();
+        }
       }
-    } else {
-      if (dialog.current?.open) {
-        dialog.current?.close();
-      }
-    }
+    }, 0);
   }, [dialog, disabled, mode, open]);
 }
 
