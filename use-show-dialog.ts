@@ -35,7 +35,7 @@ function useShowDialog({
           dialog.current?.close();
         }
       }
-    }, 0);
+    }, 5); // 0 works for all browsers except Safari (tested in 17.4.1).
   }, [dialog, disabled, mode, open]);
 }
 
