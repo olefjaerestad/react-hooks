@@ -6,15 +6,15 @@ import { MutableRefObject, useEffect, useRef } from 'react';
  *
  * Note: If you have an "open dialog" button, clicking this would by default
  * register as a click outside the dialog, and potentially close the dialog
- * before it's ever opened. To prevent this, use the optional `active` parameter
- * to control when the outside click handler should be active.
+ * before it's ever opened. To prevent this, use the optional `disabled`
+ * parameter to control when the outside click handler should be enabled.
  *
  * @example
  *
  * const [open, setOpen] = useState(true);
  * const ref = useRef<HTMLDialogElement>(null);
  *
- * const onClickOutside = useOnClickOutside(ref, open); // Note: second argument is optional.
+ * const onClickOutside = useOnClickOutside(ref, !open); // Note: second argument is optional.
  * onClickOutside((event) => {
  *   console.log('You clicked outside the open dialog');
  *   console.log(event); // The original `MouseEvent`.
@@ -27,7 +27,7 @@ import { MutableRefObject, useEffect, useRef } from 'react';
  */
 function useOnClickOutside(
   ref: MutableRefObject<HTMLElement | null | undefined>,
-  active = true
+  disabled = false
 ) {
   const cb = useRef<(event: MouseEvent) => void>();
   function onClickOutside(callback: (event: MouseEvent) => void) {
@@ -43,13 +43,19 @@ function useOnClickOutside(
       }
     }
 
-    if (active) {
+    if (!disabled) {
       setTimeout(() => {
+        /**
+         * By wrapping with a timeout, we ensure that any external click logic
+         * (e.g. 'click this button to show/hide a dialog') has the chance to
+         * run before we try to act on the click. Failing to do so could cause
+         * the outside click to interfere with the external click logic.
+         */
         document.body.addEventListener('click', handleClickOutside);
       }, 0);
     }
     return () => document.body.removeEventListener('click', handleClickOutside);
-  }, [active, ref]);
+  }, [disabled, ref]);
 
   return onClickOutside;
 }
