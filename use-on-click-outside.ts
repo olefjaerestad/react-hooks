@@ -50,11 +50,13 @@ function useOnClickOutside(
          * (e.g. 'click this button to show/hide a dialog') has the chance to
          * run before we try to act on the click. Failing to do so could cause
          * the outside click to interfere with the external click logic.
+         * For a more detailed explanation, see
+         * {@link https://codepen.io/olefjaerestad/pen/XWwoXOz?editors=1011 this CodePen}
          */
-        document.body.addEventListener('click', handleClickOutside);
+        document.addEventListener('click', handleClickOutside);
       }, 0);
     }
-    return () => document.body.removeEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
   }, [disabled, ref]);
 
   return onClickOutside;
