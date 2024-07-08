@@ -56,7 +56,12 @@ function useOnClickOutside(
         document.addEventListener('click', handleClickOutside);
       }, 0);
     }
-    return () => document.removeEventListener('click', handleClickOutside);
+    
+    return () => {
+      setTimeout(() => {
+        document.removeEventListener('click', handleClickOutside);
+      }, 0);
+    };
   }, [disabled, ref]);
 
   return onClickOutside;
