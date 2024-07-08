@@ -62,7 +62,12 @@ function useOnKeyDownInside(
         document.addEventListener('keydown', handleKeyDownInside);
       }, 0);
     }
-    return () => document.removeEventListener('keydown', handleKeyDownInside);
+
+    return () => {
+      setTimeout(() => {
+        document.removeEventListener('keydown', handleKeyDownInside);
+      }, 0);
+    };
   }, [disabled, ref]);
 
   return onKeyDownInside;
