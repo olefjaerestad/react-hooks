@@ -57,7 +57,12 @@ function useOnKeyUpOutside(
         document.addEventListener('keyup', handleKeyUpOutside);
       }, 0);
     }
-    return () => document.removeEventListener('keyup', handleKeyUpOutside);
+
+    return () => {
+      setTimeout(() => {
+        document.removeEventListener('keyup', handleKeyUpOutside);
+      }, 0);
+    };
   }, [disabled, ref]);
 
   return onKeyUpOutside;
