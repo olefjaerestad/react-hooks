@@ -39,7 +39,11 @@ function useOnKeyUpOutside(
     if (!document) return;
 
     function handleKeyUpOutside(event: KeyboardEvent) {
-      if (ref.current && !ref.current.contains(event?.target as Node)) {
+      if (
+        ref.current &&
+        (event?.target as Node).isConnected &&
+        !ref.current.contains(event?.target as Node)
+      ) {
         cb.current?.(event);
       }
     }
@@ -57,7 +61,6 @@ function useOnKeyUpOutside(
         document.addEventListener('keyup', handleKeyUpOutside);
       }, 0);
     }
-
     return () => {
       setTimeout(() => {
         document.removeEventListener('keyup', handleKeyUpOutside);
