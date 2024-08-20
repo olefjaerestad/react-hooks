@@ -38,7 +38,11 @@ function useOnClickOutside(
     if (!document) return;
 
     function handleClickOutside(event: MouseEvent) {
-      if (ref.current && !ref.current.contains(event?.target as Node)) {
+      if (
+        ref.current &&
+        (event?.target as Node).isConnected &&
+        !ref.current.contains(event?.target as Node)
+      ) {
         cb.current?.(event);
       }
     }
@@ -56,7 +60,6 @@ function useOnClickOutside(
         document.addEventListener('click', handleClickOutside);
       }, 0);
     }
-    
     return () => {
       setTimeout(() => {
         document.removeEventListener('click', handleClickOutside);
