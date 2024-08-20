@@ -44,7 +44,11 @@ function useOnKeyDownInside(
     if (!document) return;
 
     function handleKeyDownInside(event: KeyboardEvent) {
-      if (ref.current && ref.current.contains(event?.target as Node)) {
+      if (
+        ref.current &&
+        (event?.target as Node).isConnected &&
+        ref.current.contains(event?.target as Node)
+      ) {
         cb.current?.(event);
       }
     }
@@ -62,7 +66,6 @@ function useOnKeyDownInside(
         document.addEventListener('keydown', handleKeyDownInside);
       }, 0);
     }
-
     return () => {
       setTimeout(() => {
         document.removeEventListener('keydown', handleKeyDownInside);
