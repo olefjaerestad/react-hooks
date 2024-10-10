@@ -39,9 +39,7 @@ function useOnParentFormReset(
     }
 
     document.addEventListener('reset', handleParentFormReset);
-    return () => {
-      document.removeEventListener('reset', handleParentFormReset);
-    };
+    return () => document.removeEventListener('reset', handleParentFormReset);
   }, [ref]);
 
   return onParentFormReset;
