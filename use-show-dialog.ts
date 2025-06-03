@@ -23,46 +23,90 @@ function useShowDialog({
   useEffect(() => {
     if (disabled) return;
 
-    setTimeout(() => {
-      // By wrapping with a timeout, we ensure that any external show/hide logic
-      // of the dialog (e.g. adding/removing it from the DOM) has the chance to
-      // run before we try to show/hide it.
+    runWhen(
+      () => {
+        // By wrapping with an interval (`runWhen()`), we ensure that any
+        // external show/hide logic of the dialog (e.g. adding/removing it from
+        // the DOM) has the chance to run before we try to show/hide it.
 
-      if (open) {
-        if (!dialog.current?.open) {
-          mode === 'modal' ? dialog.current?.showModal() : dialog.current?.show();
-          currentMode.current = mode;
-        } else if (mode !== currentMode.current) {
-          // Close and reopen on mode change. The reopening needs a timeout of a
-          // bit longer than the dialog's animation/transition duration to ensure
-          // the mode change works correctly.
-
-          // Prevents flash of incorrect position.
-          dialog.current.style.animationDuration = '0s';
-          dialog.current.style.transitionDuration = '0s';
-
-          dialog.current?.close();
-
-          setTimeout(() => {
-            if (dialog.current) {
-              dialog.current.style.animationDuration = '';
-              dialog.current.style.transitionDuration = '';
-            }
-
+        if (open) {
+          if (!dialog.current?.open) {
             mode === 'modal'
               ? dialog.current?.showModal()
               : dialog.current?.show();
             currentMode.current = mode;
-          }, 10);
+          } else if (mode !== currentMode.current) {
+            // Close and reopen on mode change. The reopening needs a timeout of a
+            // bit longer than the dialog's animation/transition duration to ensure
+            // the mode change works correctly.
+
+            // Prevents flash of incorrect position.
+            dialog.current.style.animationDuration = '0s';
+            dialog.current.style.transitionDuration = '0s';
+
+            dialog.current?.close();
+
+            setTimeout(() => {
+              if (dialog.current) {
+                dialog.current.style.animationDuration = '';
+                dialog.current.style.transitionDuration = '';
+              }
+
+              mode === 'modal'
+                ? dialog.current?.showModal()
+                : dialog.current?.show();
+              currentMode.current = mode;
+            }, 10);
+          }
+        } else {
+          if (dialog.current?.open) {
+            dialog.current?.close();
+            currentMode.current = mode;
+          }
         }
-      } else {
-        if (dialog.current?.open) {
-          dialog.current?.close();
-          currentMode.current = mode;
-        }
-      }
-    }, 5); // 0 works for all browsers except Safari (tested in 17.4.1).
+      },
+      () => !!dialog.current
+    );
   }, [dialog, disabled, mode, open]);
+}
+
+/**
+ * Run `fn` when `condition` returns true.
+ */
+function runWhen(
+  fn: () => void,
+  condition: () => boolean,
+  options: {
+    /**
+     * Delay in milliseconds between each attempt.
+     * Default is 5ms.
+     */
+    delay?: number;
+    /**
+     * Maximum number of attempts to check the condition.
+     * Default is 50.
+     */
+    maxAttempts?: number;
+  } = {
+    delay: 5,
+    maxAttempts: 50,
+  }
+) {
+  const _options = {
+    delay: options.delay ?? 5,
+    maxAttempts: options.maxAttempts ?? 50,
+  };
+  let attempts = 0;
+
+  const interval = setInterval(() => {
+    if (condition()) {
+      clearInterval(interval);
+      fn();
+    } else if (attempts >= _options.maxAttempts) {
+      clearInterval(interval);
+    }
+    attempts++;
+  }, _options.delay);
 }
 
 export { useShowDialog };
