@@ -28,6 +28,7 @@ function useShowDialog({
         // By wrapping with an interval (`runWhen()`), we ensure that any
         // external show/hide logic of the dialog (e.g. adding/removing it from
         // the DOM) has the chance to run before we try to show/hide it.
+        // This has proven especially useful in Safari (desktop and mobile).
 
         if (open) {
           if (!dialog.current?.open) {
