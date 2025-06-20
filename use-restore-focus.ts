@@ -33,11 +33,14 @@ import { useCallback, useEffect, useRef, type FocusEvent } from 'react';
  * ```
  */
 function useRestoreFocus({
+  restoreTimeout,
   restoreWhen,
   selectRestoreElementOnBlur,
   selectRestoreElementOnFocus,
 }: {
-  /** Focused is restored when this returns true. */
+  /** Focus is restored after the provided number of milliseconds. @default undefined */
+  restoreTimeout?: number;
+  /** Focus is restored when this returns true. */
   restoreWhen: () => boolean;
   /**
    * Select element to restore focus to. Triggered when the returned
@@ -82,11 +85,18 @@ function useRestoreFocus({
   useEffect(
     function restoreFocus() {
       if (restore && restoreElement.current) {
-        restoreElement.current.focus();
-        restoreElement.current = null;
+        if (typeof restoreTimeout === 'number') {
+          setTimeout(() => {
+            restoreElement.current?.focus();
+            restoreElement.current = null;
+          }, restoreTimeout);
+        } else {
+          restoreElement.current.focus();
+          restoreElement.current = null;
+        }
       }
     },
-    [restore]
+    [restore, restoreTimeout]
   );
 
   return {
