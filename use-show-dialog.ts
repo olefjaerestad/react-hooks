@@ -12,14 +12,14 @@ function useShowDialog({
   mode,
   open,
 }: {
-  dialog: MutableRefObject<HTMLDialogElement | null | undefined>;
+  dialog: MutableRefObject<HTMLDialogElement | null | undefined> | null;
   /** Disable hook. */
   disabled?: boolean;
   mode: 'modal' | 'nonmodal';
   open: boolean;
 }) {
   const currentMode = useRef(mode);
-  
+
   useEffect(() => {
     if (disabled) return;
 
@@ -31,10 +31,10 @@ function useShowDialog({
         // This has proven especially useful in Safari (desktop and mobile).
 
         if (open) {
-          if (!dialog.current?.open) {
+          if (!dialog?.current?.open) {
             mode === 'modal'
-              ? dialog.current?.showModal()
-              : dialog.current?.show();
+              ? dialog?.current?.showModal()
+              : dialog?.current?.show();
             currentMode.current = mode;
           } else if (mode !== currentMode.current) {
             // Close and reopen on mode change. The reopening needs a timeout of a
@@ -45,28 +45,28 @@ function useShowDialog({
             dialog.current.style.animationDuration = '0s';
             dialog.current.style.transitionDuration = '0s';
 
-            dialog.current?.close();
+            dialog?.current?.close();
 
             setTimeout(() => {
-              if (dialog.current) {
+              if (dialog?.current) {
                 dialog.current.style.animationDuration = '';
                 dialog.current.style.transitionDuration = '';
               }
 
               mode === 'modal'
-                ? dialog.current?.showModal()
-                : dialog.current?.show();
+                ? dialog?.current?.showModal()
+                : dialog?.current?.show();
               currentMode.current = mode;
             }, 10);
           }
         } else {
-          if (dialog.current?.open) {
-            dialog.current?.close();
+          if (dialog?.current?.open) {
+            dialog?.current?.close();
             currentMode.current = mode;
           }
         }
       },
-      () => !!dialog.current
+      () => !!dialog?.current
     );
   }, [dialog, disabled, mode, open]);
 }
