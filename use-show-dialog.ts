@@ -4,6 +4,10 @@ import { MutableRefObject, useEffect, useRef } from 'react';
  * Show or hide a dialog element.
  * This hook is an abstraction on top of the imperative `<dialog />` API.
  *
+ * Use this hook (which uses `HTMLDialogElement.show()` and `
+ * HTMLDialogElement.showModal()` internally) instead of setting the `open` prop
+ * directly on a `<dialog />` to get focus management for free.
+ *
  * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog
  */
 function useShowDialog({
