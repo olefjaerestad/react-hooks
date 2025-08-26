@@ -1,7 +1,7 @@
 import { MutableRefObject, useEffect, useRef } from 'react';
 
 /**
- * Run callback when a click event occurs outside of the provided `ref`.
+ * Run callback when a click event occurs outside of the provided `refOrId`.
  * Useful for closing dialogs, dropdowns, etc.
  *
  * Note: If you have an "open dialog" button, clicking this would by default
@@ -26,7 +26,8 @@ import { MutableRefObject, useEffect, useRef } from 'react';
  * <dialog ref={ref} open={open}>
  */
 function useOnClickOutside(
-  ref: MutableRefObject<HTMLElement | null | undefined>,
+  /** If HTML ID, omit the '#'. */
+  refOrId: MutableRefObject<HTMLElement | null | undefined> | string,
   disabled = false
 ) {
   const cb = useRef<(event: MouseEvent) => void>();
@@ -38,10 +39,23 @@ function useOnClickOutside(
     if (!document) return;
 
     function handleClickOutside(event: MouseEvent) {
+      /**
+       * The click event could've been triggered by non-clicks, such as pressing
+       *  'enter' in a form field. If it is, let's ignore the event.
+       * @see https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail
+       */
+      const clickHappened = event.detail > 0;
+      if (!clickHappened) return;
+
+      const container =
+        typeof refOrId === 'string'
+          ? document.getElementById(refOrId)
+          : refOrId.current;
+
       if (
-        ref.current &&
+        container &&
         (event?.target as Node).isConnected &&
-        !ref.current.contains(event?.target as Node)
+        !container.contains(event?.target as Node)
       ) {
         cb.current?.(event);
       }
@@ -65,7 +79,7 @@ function useOnClickOutside(
         document.removeEventListener('click', handleClickOutside);
       }, 0);
     };
-  }, [disabled, ref]);
+  }, [disabled, refOrId]);
 
   return onClickOutside;
 }
