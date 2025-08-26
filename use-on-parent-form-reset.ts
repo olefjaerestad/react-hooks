@@ -18,7 +18,8 @@ import { MutableRefObject, useEffect, useRef } from 'react';
  * ```
  */
 function useOnParentFormReset(
-  ref: MutableRefObject<HTMLElement | null | undefined>
+  /** If HTML ID, omit the '#'. */
+  refOrId: MutableRefObject<HTMLElement | null | undefined> | string
 ) {
   const cb = useRef<(event: Event) => void>();
   function onParentFormReset(callback: (event: Event) => void) {
@@ -29,10 +30,15 @@ function useOnParentFormReset(
     if (!document) return;
 
     function handleParentFormReset(event: Event) {
+      const element =
+        typeof refOrId === 'string'
+          ? document.getElementById(refOrId)
+          : refOrId.current;
+
       if (
-        ref.current &&
+        element &&
         (event.target as HTMLFormElement | null)?.isConnected &&
-        (event.target as HTMLFormElement | null)?.contains(ref.current)
+        (event.target as HTMLFormElement | null)?.contains(element)
       ) {
         cb.current?.(event);
       }
@@ -40,7 +46,7 @@ function useOnParentFormReset(
 
     document.addEventListener('reset', handleParentFormReset);
     return () => document.removeEventListener('reset', handleParentFormReset);
-  }, [ref]);
+  }, [refOrId]);
 
   return onParentFormReset;
 }
