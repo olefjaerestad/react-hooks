@@ -27,7 +27,8 @@ import { MutableRefObject, useEffect, useRef } from 'react';
  * <dialog ref={ref} open={open}>
  */
 function useOnKeyUpOutside(
-  ref: MutableRefObject<HTMLElement | null | undefined>,
+  /** If HTML ID, omit the '#'. */
+  refOrId: MutableRefObject<HTMLElement | null | undefined> | string,
   disabled = false
 ) {
   const cb = useRef<(event: KeyboardEvent) => void>();
@@ -39,10 +40,15 @@ function useOnKeyUpOutside(
     if (!document) return;
 
     function handleKeyUpOutside(event: KeyboardEvent) {
+      const container =
+        typeof refOrId === 'string'
+          ? document.getElementById(refOrId)
+          : refOrId.current;
+
       if (
-        ref.current &&
+        container &&
         (event?.target as Node).isConnected &&
-        !ref.current.contains(event?.target as Node)
+        !container.contains(event?.target as Node)
       ) {
         cb.current?.(event);
       }
@@ -66,7 +72,7 @@ function useOnKeyUpOutside(
         document.removeEventListener('keyup', handleKeyUpOutside);
       }, 0);
     };
-  }, [disabled, ref]);
+  }, [disabled, refOrId]);
 
   return onKeyUpOutside;
 }
